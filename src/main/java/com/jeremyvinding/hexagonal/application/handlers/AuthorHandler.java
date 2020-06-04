@@ -6,7 +6,9 @@ import java.util.Optional;
 import com.jeremyvinding.hexagonal.domain.exceptions.DomainException;
 import com.jeremyvinding.hexagonal.domain.model.Author;
 import com.jeremyvinding.hexagonal.domain.usecases.AddAuthor;
+import com.jeremyvinding.hexagonal.domain.usecases.AuthorUseCase;
 import com.jeremyvinding.hexagonal.domain.usecases.GetAuthor;
+import com.jeremyvinding.hexagonal.domain.usecases.ListAuthors;
 import com.jeremyvinding.hexagonal.ports.primary.AuthorPrimaryPort;
 import com.jeremyvinding.hexagonal.ports.secondary.AuthorSecondaryPort;
 import com.jeremyvinding.hexagonal.ports.secondary.SecondaryPortException;
@@ -22,17 +24,27 @@ public class AuthorHandler implements AuthorPrimaryPort {
   }
 
   @Override
-  public void add(AddAuthor useCase) throws DomainException, SecondaryPortException {
+  public <T extends AuthorUseCase<R>, R> R execute(T useCase) throws DomainException, SecondaryPortException {
+    if (useCase instanceof AddAuthor) {
+      add((AddAuthor) useCase);
+      return null;
+    } else if (useCase instanceof ListAuthors) {
+      return (R) list();
+    } else if (useCase instanceof GetAuthor) {
+      return (R) get((GetAuthor) useCase);
+    }
+    throw new UnsupportedOperationException(useCase.getClass().getSimpleName());
+  }
+
+  private void add(AddAuthor useCase) throws SecondaryPortException {
     secondaryPort.add(useCase.getAuthor());
   }
 
-  @Override
-  public List<Author> list() throws DomainException, SecondaryPortException {
+  private List<Author> list() throws SecondaryPortException {
     return secondaryPort.list();
   }
 
-  @Override
-  public Optional<Author> get(GetAuthor useCase) throws DomainException, SecondaryPortException {
-    return secondaryPort.get(useCase.getId());
+  private Optional<Author> get(GetAuthor command) throws SecondaryPortException {
+    return secondaryPort.get(command.getId());
   }
 }

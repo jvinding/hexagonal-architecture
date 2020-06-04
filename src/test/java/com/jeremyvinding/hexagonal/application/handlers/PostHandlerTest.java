@@ -37,7 +37,7 @@ class PostHandlerTest {
     var author = Author.of(UUID.randomUUID(), null);
     var post = Post.of(UUID.randomUUID(), "post");
 
-    handler.add(PostUseCase.add(author.getId(), post));
+    handler.execute(PostUseCase.add(author.getId(), post));
 
     verify(secondaryPort, times(1)).add(eq(author), eq(post));
   }
@@ -49,7 +49,7 @@ class PostHandlerTest {
     var post1 = Post.of(UUID.randomUUID(), "Post 1");
     doReturn(List.of(post0, post1)).when(secondaryPort).list(eq(Author.of(authorId, null)));
 
-    var results = handler.list(PostUseCase.list(authorId));
+    var results = handler.execute(PostUseCase.list(authorId));
 
     assertEquals(2, results.size());
     assertEquals(post0, results.get(0));
@@ -63,7 +63,7 @@ class PostHandlerTest {
     var post = Post.of(id, "Post");
     doReturn(Optional.of(post)).when(secondaryPort).get(eq(Author.of(authorId, null)), eq(id));
 
-    var resultOptional = handler.get(PostUseCase.get(authorId, id));
+    var resultOptional = handler.execute(PostUseCase.get(authorId, id));
 
     assertTrue(resultOptional.isPresent());
     assertEquals(post, resultOptional.get());

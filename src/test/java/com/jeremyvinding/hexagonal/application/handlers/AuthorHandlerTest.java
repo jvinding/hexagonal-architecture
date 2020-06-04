@@ -35,7 +35,7 @@ class AuthorHandlerTest {
   @Test
   void addAuthor() throws Exception {
     var author = Author.of(UUID.randomUUID(), "Author");
-    handler.add(AuthorUseCase.add(author));
+    handler.execute(AuthorUseCase.add(author));
     verify(secondaryPort, times(1)).add(eq(author));
   }
 
@@ -45,7 +45,7 @@ class AuthorHandlerTest {
     var author1 = Author.of(UUID.randomUUID(), "Author 1");
     doReturn(List.of(author0, author1)).when(secondaryPort).list();
 
-    var results = handler.list();
+    var results = handler.execute(AuthorUseCase.list());
 
     assertEquals(2, results.size());
     assertEquals(author0, results.get(0));
@@ -59,7 +59,7 @@ class AuthorHandlerTest {
     var author = Author.of(authorId, name);
     doReturn(Optional.of(author)).when(secondaryPort).get(authorId);
 
-    var resultOptional = handler.get(AuthorUseCase.get(authorId));
+    var resultOptional = handler.execute(AuthorUseCase.get(authorId));
 
     assertTrue(resultOptional.isPresent());
     var result = resultOptional.get();

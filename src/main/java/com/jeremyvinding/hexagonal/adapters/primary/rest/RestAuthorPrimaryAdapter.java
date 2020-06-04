@@ -33,7 +33,7 @@ public class RestAuthorPrimaryAdapter {
   public ResponseEntity<Void> addAuthor(@PathVariable("id") UUID id, @RequestBody String name)
       throws SecondaryPortException {
     try {
-      primaryPort.add(AuthorUseCase.add(Author.of(id, name)));
+      primaryPort.execute(AuthorUseCase.add(Author.of(id, name)));
       return ResponseEntity.status(HttpStatus.CREATED).build();
     } catch (DomainException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
@@ -43,13 +43,15 @@ public class RestAuthorPrimaryAdapter {
   @GetMapping("/authors")
   @ResponseBody
   public List<RestAuthor> listAuthors() throws DomainException, SecondaryPortException {
-    return primaryPort.list().stream().map(RestAuthor::from).collect(Collectors.toList());
+    return primaryPort.execute(AuthorUseCase.list()).stream()
+        .map(RestAuthor::from)
+        .collect(Collectors.toList());
   }
 
   @GetMapping("/authors/{id}")
   @ResponseBody
   public ResponseEntity<RestAuthor> getAuthor(@PathVariable UUID id) throws DomainException, SecondaryPortException {
-    var author = primaryPort.get(AuthorUseCase.get(id)).map(RestAuthor::from);
+    var author = primaryPort.execute(AuthorUseCase.get(id)).map(RestAuthor::from);
     return author.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
   }
 }

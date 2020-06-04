@@ -47,7 +47,7 @@ class RestPostPrimaryAdapterTest {
     void success() throws Exception {
       var authorId = UUID.randomUUID();
       var post = Post.of(UUID.randomUUID(), "post");
-      doReturn(List.of(post)).when(primaryPort).list(PostUseCase.list(authorId));
+      doReturn(List.of(post)).when(primaryPort).execute(eq(PostUseCase.list(authorId)));
 
       var response = adapter.listPosts(authorId);
 
@@ -59,7 +59,7 @@ class RestPostPrimaryAdapterTest {
     @Test
     void noResults() throws Exception {
       var authorId = UUID.randomUUID();
-      doReturn(List.of()).when(primaryPort).list(eq(PostUseCase.list(authorId)));
+      doReturn(List.of()).when(primaryPort).execute(eq(PostUseCase.list(authorId)));
 
       var response = adapter.listPosts(authorId);
 
@@ -75,7 +75,7 @@ class RestPostPrimaryAdapterTest {
       var authorId = UUID.randomUUID();
       var postId = UUID.randomUUID();
       var post = Post.of(postId, "Post");
-      doReturn(Optional.of(post)).when(primaryPort).get(eq(PostUseCase.get(authorId, postId)));
+      doReturn(Optional.of(post)).when(primaryPort).execute(eq(PostUseCase.get(authorId, postId)));
 
       var response = adapter.getPostById(authorId, postId);
 
@@ -85,7 +85,7 @@ class RestPostPrimaryAdapterTest {
 
     @Test
     void noResults() throws Exception {
-      doReturn(Optional.empty()).when(primaryPort).get(any());
+      doReturn(Optional.empty()).when(primaryPort).execute(any());
 
       var response = adapter.getPostById(UUID.randomUUID(), UUID.randomUUID());
 
@@ -102,8 +102,7 @@ class RestPostPrimaryAdapterTest {
 
       var response = adapter.addPost(authorId, post.getId(), post.getBody());
 
-      verify(primaryPort, times(1)).add(eq(PostUseCase.add(authorId, post)));
-
+      verify(primaryPort, times(1)).execute(eq(PostUseCase.add(authorId, post)));
       assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }
   }

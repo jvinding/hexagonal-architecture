@@ -33,11 +33,10 @@ public class RestPostPrimaryAdapter {
 
   @PutMapping("/authors/{authorId}/posts/{id}")
   @ResponseBody
-  public ResponseEntity<RestPost> addPost(
-      @PathVariable UUID authorId, @PathVariable UUID id, @RequestBody String body)
+  public ResponseEntity<RestPost> addPost(@PathVariable UUID authorId, @PathVariable UUID id, @RequestBody String body)
       throws DomainException, SecondaryPortException, MissingAuthorException {
     var post = Post.of(id, body);
-    primaryPort.add(PostUseCase.add(authorId, post));
+    primaryPort.execute(PostUseCase.add(authorId, post));
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
@@ -45,7 +44,7 @@ public class RestPostPrimaryAdapter {
   @ResponseBody
   public ResponseEntity<List<RestPost>> listPosts(@PathVariable UUID authorId)
       throws DomainException, SecondaryPortException, MissingAuthorException {
-    var response = primaryPort.list(PostUseCase.list(authorId)).stream().map(RestPost::from)
+    var response = primaryPort.execute(PostUseCase.list(authorId)).stream().map(RestPost::from)
         .collect(Collectors.toList());
     return ResponseEntity.ok(response);
   }
@@ -54,7 +53,8 @@ public class RestPostPrimaryAdapter {
   @ResponseBody
   public ResponseEntity<RestPost> getPostById(@PathVariable UUID authorId, @PathVariable UUID id)
       throws DomainException, SecondaryPortException, MissingAuthorException {
-    return primaryPort.get(PostUseCase.get(authorId, id)).map(RestPost::from).map(ResponseEntity::ok) .orElseGet(() -> ResponseEntity.notFound().build());
+    return primaryPort.execute(PostUseCase.get(authorId, id)).map(RestPost::from).map(ResponseEntity::ok)
+        .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "No such author")

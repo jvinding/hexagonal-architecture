@@ -47,7 +47,7 @@ class RestAuthorPrimaryAdapterTest {
     void success() throws Exception {
       var author0 = Author.of(UUID.randomUUID(), "Author 0");
       var author1 = Author.of(UUID.randomUUID(), "Author 1");
-      doReturn(List.of(author0, author1)).when(primaryPort).list();
+      doReturn(List.of(author0, author1)).when(primaryPort).execute(eq(AuthorUseCase.list()));
 
       var response = adapter.listAuthors();
 
@@ -58,7 +58,7 @@ class RestAuthorPrimaryAdapterTest {
 
     @Test
     void noResults() throws Exception {
-      doReturn(List.of()).when(primaryPort).list();
+      doReturn(List.of()).when(primaryPort).execute(eq(AuthorUseCase.list()));
 
       var response = adapter.listAuthors();
 
@@ -71,7 +71,7 @@ class RestAuthorPrimaryAdapterTest {
     @Test
     void success() throws Exception {
       var author = Author.of(UUID.randomUUID(), "Author 0");
-      doReturn(Optional.of(author)).when(primaryPort).get(eq(AuthorUseCase.get(author.getId())));
+      doReturn(Optional.of(author)).when(primaryPort).execute(eq(AuthorUseCase.get(author.getId())));
 
       var response = adapter.getAuthor(author.getId());
 
@@ -82,7 +82,7 @@ class RestAuthorPrimaryAdapterTest {
 
     @Test
     void noResults() throws Exception {
-      doReturn(Optional.empty()).when(primaryPort).get(any());
+      doReturn(Optional.empty()).when(primaryPort).execute(any());
 
       var response = adapter.getAuthor(UUID.randomUUID());
 
@@ -97,8 +97,7 @@ class RestAuthorPrimaryAdapterTest {
       var author = Author.of(UUID.randomUUID(), "Author 0");
 
       var response = adapter.addAuthor(author.getId(), author.getName());
-
-      verify(primaryPort, times(1)).add(eq(AuthorUseCase.add(author)));
+      verify(primaryPort, times(1)).execute(eq(AuthorUseCase.add(author)));
       assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }
   }
