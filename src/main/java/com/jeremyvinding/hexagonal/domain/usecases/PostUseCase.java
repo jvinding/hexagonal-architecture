@@ -16,4 +16,6 @@ public interface PostUseCase<ResponseType> {
   static GetPost get(UUID authorId, UUID postId) {
     return new GetPost(authorId, postId);
   }
+
+  UUID getAuthorId();
 }
