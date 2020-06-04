@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.jeremyvinding.hexagonal.domain.exceptions.DomainException;
 import com.jeremyvinding.hexagonal.domain.model.Post;
+import com.jeremyvinding.hexagonal.domain.usecases.PostUseCase;
 import com.jeremyvinding.hexagonal.ports.primary.PostPrimaryPort;
 import com.jeremyvinding.hexagonal.ports.secondary.MissingAuthorException;
 import com.jeremyvinding.hexagonal.ports.secondary.SecondaryPortException;
@@ -36,7 +37,7 @@ public class RestPostPrimaryAdapter {
       @PathVariable UUID authorId, @PathVariable UUID id, @RequestBody String body)
       throws DomainException, SecondaryPortException, MissingAuthorException {
     var post = Post.of(id, body);
-    primaryPort.add(authorId, post);
+    primaryPort.add(PostUseCase.add(authorId, post));
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
@@ -44,8 +45,8 @@ public class RestPostPrimaryAdapter {
   @ResponseBody
   public ResponseEntity<List<RestPost>> listPosts(@PathVariable UUID authorId)
       throws DomainException, SecondaryPortException, MissingAuthorException {
-    var response =
-        primaryPort.list(authorId).stream().map(RestPost::from).collect(Collectors.toList());
+    var response = primaryPort.list(PostUseCase.list(authorId)).stream().map(RestPost::from)
+        .collect(Collectors.toList());
     return ResponseEntity.ok(response);
   }
 
@@ -53,8 +54,7 @@ public class RestPostPrimaryAdapter {
   @ResponseBody
   public ResponseEntity<RestPost> getPostById(@PathVariable UUID authorId, @PathVariable UUID id)
       throws DomainException, SecondaryPortException, MissingAuthorException {
-    var post = primaryPort.get(authorId, id).map(RestPost::from);
-    return post.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    return primaryPort.get(PostUseCase.get(authorId, id)).map(RestPost::from).map(ResponseEntity::ok) .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "No such author")

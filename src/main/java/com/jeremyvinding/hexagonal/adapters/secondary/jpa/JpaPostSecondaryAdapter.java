@@ -43,7 +43,7 @@ class JpaPostSecondaryAdapter implements PostSecondaryPort {
     } catch (MissingAuthorException e) {
       throw e;
     } catch (Exception e) {
-      throw new SecondaryPortException("Failed listing post for " + author, e);
+      throw new SecondaryPortException("Failed listing posts for " + author, e);
     }
   }
 

@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.jeremyvinding.hexagonal.domain.model.Author;
+import com.jeremyvinding.hexagonal.domain.usecases.AuthorUseCase;
 import com.jeremyvinding.hexagonal.ports.secondary.AuthorSecondaryPort;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,7 @@ class AuthorHandlerTest {
   @Test
   void addAuthor() throws Exception {
     var author = Author.of(UUID.randomUUID(), "Author");
-    handler.add(author);
+    handler.add(AuthorUseCase.add(author));
     verify(secondaryPort, times(1)).add(eq(author));
   }
 
@@ -58,7 +59,7 @@ class AuthorHandlerTest {
     var author = Author.of(authorId, name);
     doReturn(Optional.of(author)).when(secondaryPort).get(authorId);
 
-    var resultOptional = handler.get(authorId);
+    var resultOptional = handler.get(AuthorUseCase.get(authorId));
 
     assertTrue(resultOptional.isPresent());
     var result = resultOptional.get();

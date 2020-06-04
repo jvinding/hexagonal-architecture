@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.jeremyvinding.hexagonal.domain.model.Author;
+import com.jeremyvinding.hexagonal.domain.usecases.AuthorUseCase;
 import com.jeremyvinding.hexagonal.ports.primary.AuthorPrimaryPort;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -70,7 +71,7 @@ class RestAuthorPrimaryAdapterTest {
     @Test
     void success() throws Exception {
       var author = Author.of(UUID.randomUUID(), "Author 0");
-      doReturn(Optional.of(author)).when(primaryPort).get(eq(author.getId()));
+      doReturn(Optional.of(author)).when(primaryPort).get(eq(AuthorUseCase.get(author.getId())));
 
       var response = adapter.getAuthor(author.getId());
 
@@ -93,11 +94,11 @@ class RestAuthorPrimaryAdapterTest {
   class AddAuthor {
     @Test
     void success() throws Exception {
-      Author author = Author.of(UUID.randomUUID(), "Author 0");
+      var author = Author.of(UUID.randomUUID(), "Author 0");
 
       var response = adapter.addAuthor(author.getId(), author.getName());
 
-      verify(primaryPort, times(1)).add(eq(author));
+      verify(primaryPort, times(1)).add(eq(AuthorUseCase.add(author)));
       assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }
   }

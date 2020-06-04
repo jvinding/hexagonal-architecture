@@ -24,10 +24,8 @@ import lombok.ToString;
 @EqualsAndHashCode
 @Entity(name = "author")
 class JpaAuthor {
-  @Id
-  private UUID id;
-  @Column
-  private String name;
+  @Id private UUID id;
+  @Column private String name;
 
   @OneToMany(mappedBy = "author")
   private List<JpaPost> posts;

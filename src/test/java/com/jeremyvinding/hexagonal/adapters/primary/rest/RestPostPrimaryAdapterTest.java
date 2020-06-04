@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.jeremyvinding.hexagonal.domain.model.Post;
+import com.jeremyvinding.hexagonal.domain.usecases.PostUseCase;
 import com.jeremyvinding.hexagonal.ports.primary.PostPrimaryPort;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +47,7 @@ class RestPostPrimaryAdapterTest {
     void success() throws Exception {
       var authorId = UUID.randomUUID();
       var post = Post.of(UUID.randomUUID(), "post");
-      doReturn(List.of(post)).when(primaryPort).list(authorId);
+      doReturn(List.of(post)).when(primaryPort).list(PostUseCase.list(authorId));
 
       var response = adapter.listPosts(authorId);
 
@@ -58,7 +59,7 @@ class RestPostPrimaryAdapterTest {
     @Test
     void noResults() throws Exception {
       var authorId = UUID.randomUUID();
-      doReturn(List.of()).when(primaryPort).list(eq(authorId));
+      doReturn(List.of()).when(primaryPort).list(eq(PostUseCase.list(authorId)));
 
       var response = adapter.listPosts(authorId);
 
@@ -74,7 +75,7 @@ class RestPostPrimaryAdapterTest {
       var authorId = UUID.randomUUID();
       var postId = UUID.randomUUID();
       var post = Post.of(postId, "Post");
-      doReturn(Optional.of(post)).when(primaryPort).get(eq(authorId), eq(postId));
+      doReturn(Optional.of(post)).when(primaryPort).get(eq(PostUseCase.get(authorId, postId)));
 
       var response = adapter.getPostById(authorId, postId);
 
@@ -84,7 +85,7 @@ class RestPostPrimaryAdapterTest {
 
     @Test
     void noResults() throws Exception {
-      doReturn(Optional.empty()).when(primaryPort).get(any(), any());
+      doReturn(Optional.empty()).when(primaryPort).get(any());
 
       var response = adapter.getPostById(UUID.randomUUID(), UUID.randomUUID());
 
@@ -101,7 +102,7 @@ class RestPostPrimaryAdapterTest {
 
       var response = adapter.addPost(authorId, post.getId(), post.getBody());
 
-      verify(primaryPort, times(1)).add(eq(authorId), eq(post));
+      verify(primaryPort, times(1)).add(eq(PostUseCase.add(authorId, post)));
 
       assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }

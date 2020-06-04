@@ -2,10 +2,11 @@ package com.jeremyvinding.hexagonal.application.handlers;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import com.jeremyvinding.hexagonal.domain.exceptions.DomainException;
 import com.jeremyvinding.hexagonal.domain.model.Author;
+import com.jeremyvinding.hexagonal.domain.usecases.AddAuthor;
+import com.jeremyvinding.hexagonal.domain.usecases.GetAuthor;
 import com.jeremyvinding.hexagonal.ports.primary.AuthorPrimaryPort;
 import com.jeremyvinding.hexagonal.ports.secondary.AuthorSecondaryPort;
 import com.jeremyvinding.hexagonal.ports.secondary.SecondaryPortException;
@@ -21,8 +22,8 @@ public class AuthorHandler implements AuthorPrimaryPort {
   }
 
   @Override
-  public void add(Author author) throws DomainException, SecondaryPortException {
-    secondaryPort.add(author);
+  public void add(AddAuthor useCase) throws DomainException, SecondaryPortException {
+    secondaryPort.add(useCase.getAuthor());
   }
 
   @Override
@@ -31,7 +32,7 @@ public class AuthorHandler implements AuthorPrimaryPort {
   }
 
   @Override
-  public Optional<Author> get(UUID authorId) throws DomainException, SecondaryPortException {
-    return secondaryPort.get(authorId);
+  public Optional<Author> get(GetAuthor useCase) throws DomainException, SecondaryPortException {
+    return secondaryPort.get(useCase.getId());
   }
 }
