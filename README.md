@@ -8,8 +8,8 @@ A very simple app to demonstrate the Hexagonal Architecture (Ports & Adapters) p
 
 # Notes
 
-1. This is just an example, package names, class names, etc are not necessarily following any kind of recommended pattern.
-2. There are several branches that show variations of the app.
+1. For demonstration purposes, packages, and classes are named for their roles in the Hexagonal Architecture pattern. These names do not, in any way, reflect the way things should be done in a "real" app.
+2. There are several branches that show variations of the app. Although each branch builds upon the previous branch, one should not infer that each branch is *better* than the previous. Each of the demonstrated patterns may be valid for certain circumstances.
     1. 1-simple-hexagon - This is a very simple "pure" version of a Hexagonal app.
     2. 2-simple-with-use-cases - This one just adds "use cases" to the above app.
     3. 3-mediator - replace the primary port handler with a mediator pattern.
